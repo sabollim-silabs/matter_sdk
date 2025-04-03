@@ -26,77 +26,163 @@
  *
  */
 
-#pragma once
+ #pragma once
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#endif
-
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
-#endif
-
-// For convenience, Chip Security Test Mode can be enabled and the
-// requirement for authentication in various protocols can be disabled.
-//
-//    WARNING: These options make it possible to circumvent basic Chip security functionality,
-//    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
-//
-#define CHIP_CONFIG_SECURITY_TEST_MODE 0
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
- *
- * 0xFFF1: Test vendor
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
- *
- * 0x8006: example lock app
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for Chip-over-BLE (CHIPoBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
-
-/**
- * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
- *
- * Enables the use of a hard-coded default serial number if none
- * is found in Chip NV storage.
- */
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
-/**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
-/**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
- *
- * A size, in bytes, of the individual debug event logging buffer.
- */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-/**
- *  @def CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
- *
- *  @brief
- *    Active retransmit interval, or time to wait before retransmission after
- *    subsequent failures in milliseconds.
- *
- *  This is the default value, that might be adjusted by end device depending on its
- *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
- *
- */
-#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
+ #include <stdint.h>
+ 
+ // Use a default pairing code if one hasn't been provisioned in flash.
+ #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+ #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+ #endif
+ 
+ #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+ #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+ #endif
+ 
+ // For convenience, Chip Security Test Mode can be enabled and the
+ // requirement for authentication in various protocols can be disabled.
+ //
+ //    WARNING: These options make it possible to circumvent basic Chip security functionality,
+ //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+ //
+ #define CHIP_CONFIG_SECURITY_TEST_MODE 0
+ 
+ /**
+  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+  *
+  * 0xFFF1: Test vendor
+  */
+ #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+ 
+ /**
+  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
+  *
+  * 0x8006: example lock app
+  */
+ #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
+ 
+ /**
+  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+  *
+  * Enable support for Chip-over-BLE (CHIPoBLE).
+  */
+ #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+ 
+ /**
+  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+  *
+  * Enables the use of a hard-coded default serial number if none
+  * is found in Chip NV storage.
+  */
+ #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
+ 
+ /**
+  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+  *
+  * Enable recording UTC timestamps.
+  */
+ #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
+ 
+ /**
+  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
+  *
+  * A size, in bytes, of the individual debug event logging buffer.
+  */
+ #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+ 
+ /**
+  *  @def CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+  *
+  *  @brief
+  *    Active retransmit interval, or time to wait before retransmission after
+  *    subsequent failures in milliseconds.
+  *
+  *  This is the default value, that might be adjusted by end device depending on its
+  *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
+  *
+  */
+ #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
+ 
+ namespace SilabsDoorLockConfig {
+ namespace ResourceRanges {
+ // Used to size arrays
+ static constexpr uint16_t kMaxUsers                  = 10;
+ static constexpr uint8_t kMaxCredentialsPerUser      = 10;
+ static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
+ static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
+ static constexpr uint8_t kMaxHolidaySchedules        = 10;
+ static constexpr uint8_t kMaxCredentialSize          = 20;
+ static constexpr uint8_t kNumCredentialTypes         = 6;
+ 
+ } // namespace ResourceRanges
+ 
+ namespace LockInitParams {
+ 
+ struct LockParam
+ {
+     // Read from zap attributes
+     uint16_t numberOfUsers                  = 0;
+     uint8_t numberOfCredentialsPerUser      = 0;
+     uint8_t numberOfWeekdaySchedulesPerUser = 0;
+     uint8_t numberOfYeardaySchedulesPerUser = 0;
+     uint8_t numberOfHolidaySchedules        = 0;
+ };
+ 
+ class ParamBuilder
+ {
+ public:
+     ParamBuilder & SetNumberOfUsers(uint16_t numberOfUsers)
+     {
+         lockParam_.numberOfUsers = numberOfUsers;
+         return *this;
+     }
+     ParamBuilder & SetNumberOfCredentialsPerUser(uint8_t numberOfCredentialsPerUser)
+     {
+         lockParam_.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
+         return *this;
+     }
+     ParamBuilder & SetNumberOfWeekdaySchedulesPerUser(uint8_t numberOfWeekdaySchedulesPerUser)
+     {
+         lockParam_.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
+         return *this;
+     }
+     ParamBuilder & SetNumberOfYeardaySchedulesPerUser(uint8_t numberOfYeardaySchedulesPerUser)
+     {
+         lockParam_.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
+         return *this;
+     }
+     ParamBuilder & SetNumberOfHolidaySchedules(uint8_t numberOfHolidaySchedules)
+     {
+         lockParam_.numberOfHolidaySchedules = numberOfHolidaySchedules;
+         return *this;
+     }
+     LockParam GetLockParam() { return lockParam_; }
+ 
+ private:
+     LockParam lockParam_;
+ };
+ 
+ } // namespace LockInitParams
+ } // namespace SilabsDoorLockConfig
+ 
+ /**
+  * DOOR_LOCK_USE_LOCAL_BUFFER
+  *
+  * If enabled, door-lock-server will use a local buffer for stored data to be copied into.
+  */
+ #define DOOR_LOCK_USE_LOCAL_BUFFER 1
+ 
+ /**
+  * DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH
+  *
+  * A size, in bytes, of an individual credential.
+  */
+ 
+ #define DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialsPerUser
+ /**
+  * DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH
+  *
+  * Number of CredentialStructs attached to a user.
+  */
+ #define DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialSize
+ 
