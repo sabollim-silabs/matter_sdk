@@ -235,12 +235,12 @@
          return StorageKeyName::Formatted("g/e/%x/lu/%x/lw/%x", endpoint, userIndex, scheduleIndex);
      }
      // Stores YearDayScheduleInfo corresponding to a user and schedule index
-     static StorageKeyName LockUserYearDayScheduleEndpoint(uint16_t userIndex, uint16_t scheduleIndex, chip::EndpointId endpoint)
+     static StorageKeyName LockUserYearDayScheduleEndpoint(chip::EndpointId endpoint, uint16_t userIndex, uint16_t scheduleIndex)
      {
          return StorageKeyName::Formatted("g/e/%x/lu/%x/ly/%x", endpoint, userIndex, scheduleIndex);
      }
      // Stores HolidayScheduleInfo corresponding to a schedule index
-     static StorageKeyName LockHolidayScheduleEndpoint(uint16_t scheduleIndex, chip::EndpointId endpoint)
+     static StorageKeyName LockHolidayScheduleEndpoint(chip::EndpointId endpoint, uint16_t scheduleIndex)
      {
          return StorageKeyName::Formatted("g/e/%x/lh/%x", endpoint, scheduleIndex);
      }
