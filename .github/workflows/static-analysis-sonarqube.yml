@@ -1,40 +1,42 @@
-
 name: SonarQube PR Analysis
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+    pull_request:
+        types: [opened, synchronize, reopened]
 
 jobs:
-  sonarqube:
-    name: SonarQube PR Scan
-    runs-on: ubuntu-latest
+    sonarqube:
+        name: SonarQube PR Scan
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
+              with:
+                  java-version: "17"
+                  distribution: "temurin"
 
-      - name: Cache SonarQube packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+            - name: Cache SonarQube packages
+              uses: actions/cache@v3
+              with:
+                  path: ~/.sonar/cache
+                  key:
+                      ${{ runner.os }}-sonar-${{ github.repository }}-${{
+                      github.ref_name }}
+                  restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build and analyze with SonarQube
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn clean verify sonar:sonar \
-            -Dsonar.projectKey=unify_matter_pc \
-            -Dsonar.host.url=https://sonarqube.silabs.net \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
-            -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-            -Dsonar.pullrequest.base=${{ github.base_ref }}
+            - name: Build and analyze with SonarQube
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+              run: |
+                  mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=unify_matter_pc \
+                    -Dsonar.host.url=${{ env.SONAR_HOST_URL }} \
+                    -Dsonar.pullrequest.key=${{ github.event.pull_request.number || 'unknown' }} \
+                    -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
+                    -Dsonar.pullrequest.branch=${{ github.head_ref || 'default-branch' }} \
+                    -Dsonar.pullrequest.base=${{ github.base_ref || 'default_base_ref' }}
