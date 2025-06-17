@@ -1,0 +1,31 @@
+name: Static Analysis
+
+on:
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  clang-tidy:
+    name: Run clang-tidy on changed files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Needed for full git history
+
+      - name: Install clang-tidy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy
+
+      - name: Run clang-tidy on changed files
+        run: |
+          git fetch origin main
+          git diff --name-only origin/main...HEAD | grep -E '\.(cpp|c|h)$' > changed_files.txt || true
+          if [ -s changed_files.txt ]; then
+            cat changed_files.txt | xargs -I{} clang-tidy {} -- -std=c++11 || true
+          else
+            echo "No C/C++ files changed."
+          fi
