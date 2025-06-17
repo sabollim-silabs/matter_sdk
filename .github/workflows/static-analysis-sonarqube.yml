@@ -12,31 +12,38 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
-
-            - name: Set up JDK 17
-              uses: actions/setup-java@v3
               with:
-                  java-version: "17"
-                  distribution: "temurin"
+                  fetch-depth: 0 # Needed to get full git history for diff
 
-            - name: Cache SonarQube packages
-              uses: actions/cache@v3
-              with:
-                  path: ~/.sonar/cache
-                  key:
-                      ${{ runner.os }}-sonar-${{ github.repository }}-${{
-                      github.ref_name }}
-                  restore-keys: ${{ runner.os }}-sonar
+            - name: Get list of changed files
+              id: changed-files
+              run: |
+                  git fetch origin ${{ github.base_ref }}
+                  CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '^src/' | paste -sd "," -)
+                  echo "CHANGED_FILES=$CHANGED_FILES" >> $GITHUB_ENV
 
-            - name: Build and analyze with SonarQube
+            - name: Install SonarScanner CLI
+              run: |
+                  wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+                  unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+                  mv sonar-scanner-*/ sonar-scanner
+
+            - name: Add SonarScanner to PATH
+              run:
+                  echo "${{ github.workspace }}/sonar-scanner/bin" >>
+                  $GITHUB_PATH
+
+            - name: Run SonarScanner CLI
               env:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
                   SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
               run: |
-                  mvn clean verify sonar:sonar \
+                  sonar-scanner \
                     -Dsonar.projectKey=unify_matter_pc \
-                    -Dsonar.host.url=${{ env.SONAR_HOST_URL }} \
-                    -Dsonar.pullrequest.key=${{ github.event.pull_request.number || 'unknown' }} \
-                    -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
-                    -Dsonar.pullrequest.branch=${{ github.head_ref || 'default-branch' }} \
-                    -Dsonar.pullrequest.base=${{ github.base_ref || 'default_base_ref' }}
+                    -Dsonar.sources=src \
+                    -Dsonar.inclusions=$CHANGED_FILES \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_TOKEN \
+                    -Dsonar.pullrequest.key="${{ github.event.pull_request.number }}" \
+                    -Dsonar.pullrequest.branch="${{ github.head_ref }}" \
+                    -Dsonar.pullrequest.base="${{ github.base_ref }}"
