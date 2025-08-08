@@ -26,10 +26,11 @@
 #define MBEDTLS_HKDF_C
 #define MBEDTLS_PKCS5_C
 
-// DIC Specific Configurations
-#ifdef DIC_ENABLE
-
+// RMC Specific Configurations
+#ifdef RMC_ENABLE
+#ifndef MBEDTLS_MPI_MAX_SIZE
 #define MBEDTLS_MPI_MAX_SIZE 512
+#endif
 
 #define MBEDTLS_CIPHER_MODE_CBC
 #define MBEDTLS_CIPHER_MODE_WITH_PADDING
@@ -38,11 +39,15 @@
 #define MBEDTLS_RSA_C
 #define MBEDTLS_RSA_NO_CRT
 #define MBEDTLS_SHA1_C
+#ifndef MBEDTLS_SSL_IN_CONTENT_LEN
 #define MBEDTLS_SSL_IN_CONTENT_LEN 5120
+#endif
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 5120
+#ifndef MBEDTLS_SSL_OUT_CONTENT_LEN
 #define MBEDTLS_SSL_OUT_CONTENT_LEN 1560
+#endif
 
-#endif // DIC_ENABLE
+#endif // RMC_ENABLE
 
 #ifdef SL_MBEDTLS_USE_TINYCRYPT
 #define TINYCRYPT_PRIMITIVES
@@ -50,7 +55,7 @@
 
 #define MBEDTLS_FREERTOS
 
-#if (!(DIC_ENABLE) || !defined(DIC_ENABLE))
+#if (!(RMC_ENABLE) || !defined(RMC_ENABLE))
 /**< Maximum windows size used. */
 #define MBEDTLS_MPI_WINDOW_SIZE 1
 
@@ -58,7 +63,7 @@
 #define MBEDTLS_MPI_MAX_SIZE 32
 /**< Maxium fragment length in bytes */
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768
-#endif // !(DIC_ENABLE)
+#endif // !(RMC_ENABLE)
 
 #define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf

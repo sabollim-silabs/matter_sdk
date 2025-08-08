@@ -345,3 +345,7 @@
 	path = third_party/re2/src
 	url = https://github.com/google/re2.git
 	platforms = linux,darwin
+[submodule "third_party/silabs/aws_ota_sdk/ota-for-aws-iot-embedded-sdk"]
+	path = third_party/silabs/aws_ota_sdk/ota-for-aws-iot-embedded-sdk
+	url = https://github.com/aws/ota-for-aws-iot-embedded-sdk.git
+	platforms = silabs

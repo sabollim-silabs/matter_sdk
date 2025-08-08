@@ -72,7 +72,7 @@
 
 #define TCPIP_THREAD_PRIO osPriorityAboveNormal
 
-#ifdef DIC_ENABLE
+#ifdef RMC_ENABLE
 #define LWIP_DNS 1
 #define DNS_RAND_TXID() ((u32_t) rand())
 #define MEM_SIZE 5632
@@ -82,7 +82,7 @@
 #define LWIP_DNS 0
 #define MEMP_NUM_UDP_PCB (5)
 #define TCP_MSS (1152)
-#endif // DIC_ENABLE
+#endif // RMC_ENABLE
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 

@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2022 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,17 +17,12 @@
  *    limitations under the License.
  */
 
-#pragma once
+#ifndef __ALTCP_OPTS_H__
+#define __ALTCP_OPTS_H__
 
-// RMC Specific Configurations
-#ifdef RMC_ENABLE
-#define MBEDTLS_PSA_BUILTIN_ALG_TLS12_PRF
+#define TRANSPORT_ALTCP             1
+#define TRANSPORT_ALTCP_TLS         1
+#define TRANSPORT_ALTCP_TLS_MBEDTLS 1
+#define TRANSPORT_DEBUG             1
 
-#define PSA_WANT_ALG_CBC_NO_PADDING
-#define PSA_WANT_ALG_RSA_PKCS1V15_SIGN
-#define PSA_WANT_ALG_SOME_PAKE
-#define PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
-#endif // RMC_ENABLE
-
-// SLC GENERATED
-#include "psa_crypto_config.h"
+#endif
